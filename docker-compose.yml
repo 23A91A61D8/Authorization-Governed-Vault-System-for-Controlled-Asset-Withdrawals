@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  blockchain:
+    image: node:18-alpine
+    container_name: local-blockchain
+    working_dir: /app
+    ports:
+      - "8545:8545"
+    command: >
+      sh -c "
+      npm install -g hardhat &&
+      npx hardhat node
+      "
+
+  deployer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: contract-deployer
+    depends_on:
+      - blockchain
+    environment:
+      - HARDHAT_NETWORK=localhost
+    network_mode: "host"
